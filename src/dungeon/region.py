@@ -1,5 +1,6 @@
 import pygame
 from dungeon import Settings
+
 class Region:
     #represents a BSP node which may split into 2 child nodes
     def __init__(self, rect, depth=0):
