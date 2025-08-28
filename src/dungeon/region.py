@@ -46,3 +46,7 @@ class Region:
 
     def createRoom(self):
         pass
+
+    def splitUntilCannot(self):
+        pass
+    

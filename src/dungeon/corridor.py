@@ -1,11 +1,8 @@
 class Corridoor:
-    def __init__(self):
-        pass
+    def __init__(self, path, width=1):
+        self.path = path
+        self.width = width
 
-    def straightPath(self):
-        pass
-
-    def LPath(self):
-        pass
+    
     
 
