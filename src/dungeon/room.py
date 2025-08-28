@@ -26,7 +26,7 @@ class Room:
             horizontal = False
         
         #choosing vertical edge that faces the target
-        if horizontal = True:
+        if horizontal == True:
             if dx >= 0:
                 xEdge = self.rect.right - 1
             else:
