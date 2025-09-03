@@ -1,3 +1,4 @@
+import pygame
 class DungeonMap:
     #dungeonmap is a 2D tilemap grid using the following key for tiling: 
     #0 = wall, 1 = room, 2 = corridoor
@@ -14,8 +15,13 @@ class DungeonMap:
                 xcoord = xcoord + 1
             self.tiles.append(row)
             ycoord = ycoord + 1
+
+    def markTile(self, x, y, indicator):
+        if 0 <= x < self.width and 0 <= y < self.height:
+            self.tiles[y][x] = indicator #used to mark each tile within bounds of the dungeon
+
     
-    def carveRect(self, rect):
+    def drawRect(self, rect):
         y = rect.top
         while y < rect.bottom:
             x = rect.left
@@ -52,8 +58,8 @@ class DungeonMap:
                 x = xend
                 xE = xstart
             while x <= xE:
-                dy = height // 2
-                while dy <= height // 2:
+                dy = width // 2
+                while dy <= width // 2:
                     yy = ystart = dy
                     if 0 <= x < self.width and 0 <= yy < self.height:
                         if self.tiles[yy][x] == 0:
@@ -61,7 +67,26 @@ class DungeonMap:
                     dy = dy + 1
                 x = x + 1
 
-            
+    def drawDungeon(self, surface, tileSize=10):
+        WALL = (25,25,30)
+        ROOM = (200, 200, 200)
+        CORRIDOR = (120, 120, 120)
+        y = 0
+        while y < self.height:
+            row = self.tiles[y] #selecting a column
+            x = 0
+            while x < self.width:
+                t = row[x] #navigating through rows in the chosen column
+                if t == 0:
+                    pygame.draw.rect(surface, WALL, pygame.rect(x*tileSize, y*tileSize, tileSize, tileSize))
+                elif t == 1:
+                    pygame.draw.rect(surface, ROOM, pygame.rect(x*tileSize, y*tileSize, tileSize, tileSize))
+                elif t == 2:
+                    pygame.draw.rect(surface, CORRIDOR, pygame.rect(x*tileSize, y*tileSize, tileSize, tileSize))
+                x = x + 1
+            y = y + 1
+    
+
         
 
 
