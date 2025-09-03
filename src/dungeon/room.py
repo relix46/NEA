@@ -11,7 +11,7 @@ class Room:
         #create room and fit it inside region
         pass
     
-    def perimiterPointsFacing(self, target):
+    def boundaryPointsFacing(self, target):
         #check sorting of coords~~~~~~~~~~~~~~~
         #return a list of points on one edge of the room closer towards the target
         #these points will be used to place the corridors
@@ -56,7 +56,6 @@ class Room:
                 result.append((yEdge, xcoords[i]))
                 i = i + 1
         return result
-    
 
 
 
