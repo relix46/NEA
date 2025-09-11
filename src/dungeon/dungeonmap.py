@@ -67,6 +67,34 @@ class DungeonMap:
                     dy = dy + 1
                 x = x + 1
 
+
+    def drawStairs(self, surface, x, y, tileSize, up = True):
+        if up == True:
+            baseColor = (30, 30, 60)
+        else:
+            baseColor = (12, 12, 12)
+
+        stepColor = (90, 90, 120)
+
+        #draw background square
+        rect = pygame.Rect(x*tileSize, y*tileSize, tileSize, tileSize)
+        pygame.draw.Rect(surface, baseColor, rect)
+
+        #create a 5 step stair
+        stepHeight = max(2, tileSize // 5) #create step with minimum height of 2
+        i = 0
+        while i < 5:
+            width = rect.width - i * max(1, tileSize // 5)
+            if stepHeight >= 5:
+                height = stepHeight
+            else:
+                height = stepHeight - 1
+
+            stepRect = pygame.Rect(rect.left, rect.top + i * stepHeight, width, height)
+            pygame.draw.Rect(surface, stepColor, stepHeight)
+
+
+
     def drawDungeon(self, surface, tileSize=10):
         WALL = (25,25,30)
         ROOM = (200, 200, 200)
@@ -83,25 +111,19 @@ class DungeonMap:
                     pygame.draw.rect(surface, ROOM, pygame.rect(x*tileSize, y*tileSize, tileSize, tileSize))
                 elif t == 2:
                     pygame.draw.rect(surface, CORRIDOR, pygame.rect(x*tileSize, y*tileSize, tileSize, tileSize))
+                elif t == 3:
+                    self.drawStairs(surface, x, y, tileSize, up = True)
+                else:
+                    self.drawStairs(surface, x, y, tileSize, up = False)
                 x = x + 1
             y = y + 1
+
     
 
-        
-
 
         
 
-    def createMap(self):
-        pass
 
-    def splitRegions(self):
-        pass
-
-    def createRoom(self):
-        pass
-
-    def connectRooms(self):
-        pass
+        
 
     

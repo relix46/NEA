@@ -15,6 +15,8 @@ class createDungeon:
         self.leaves = []
         self.rooms = []
         self.corridors = []
+        self.stairsUp = None
+        self.stairsDown = None
 
 
 
@@ -88,6 +90,11 @@ class createDungeon:
                 DMap.drawLine(x.path[j], x.path[j+1], self.dungeonConfig.corridorWidth)
                 k = k + 1
             j = j + 1
+        if self.stairsUp is not None:
+            DungeonMap.markTile(self.stairsUp[0], self.stairsUp[1], 3)
+        if self.stairsDown is not None:
+            DungeonMap.markTile(self.stairsDown[0], self.stairsDown[1], 4)
+        
         return DMap
                           
         
