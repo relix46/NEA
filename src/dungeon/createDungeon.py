@@ -21,6 +21,9 @@ class createDungeon:
     def buildDungeon(self):
         self.leaves = splitUntilCannot(self.dungeonConfig, self.root) #binary split
         self._make_rooms() #creating rooms
+        self._connectRooms()
+        return self._rasterizeDungeon()
+
 
     
 
@@ -40,8 +43,6 @@ class createDungeon:
                 self.rooms.append(leaf.room)
             i += 1
 
-    def _connect_rooms(self):
-        pass
     
     def _closestPair(self, leftList, rightList): 
         #pick two rooms, one from each list with the smallest manhattahn distance between them
@@ -66,8 +67,32 @@ class createDungeon:
         #choose points on eacch room edge facing another room and then build a path connecting them  
         roomADoors = roomA.boundaryPointsFacing(roomB.center())
         roomBDoors = roomB.boundaryPointsFacing(roomA.center())
-        if len(roomADoors) == 0 or len(roomBDoors) == 0:
+        if len(roomADoors) == 0 or len(roomBDoors) == 0: 
             a = roomA.center()
             b = roomB.center()
-            return[a,]
-        pass
+            return[a,b]
+    
+    def _rasterizeDungeon(self):
+        DMap = DungeonMap(self.dungeonConfig.width, self.dungeonConfig.height)
+        #carve rooms
+        i = 0
+        while i < len(self.rooms):
+            DMap.drawRect(self.rooms[i].rect)
+            i = i + 1 #going through each room and drawing a rectangle
+
+        j = 0
+        while j < self.corridors:
+            x = self.corridors[j]
+            k = 0
+            while k < len(x.path) - 1:
+                DMap.drawLine(x.path[j], x.path[j+1], self.dungeonConfig.corridorWidth)
+                k = k + 1
+            j = j + 1
+        return DMap
+                          
+        
+
+
+
+
+
