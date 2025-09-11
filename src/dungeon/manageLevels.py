@@ -26,3 +26,7 @@ class manageLevels:
         else:
             self.current = (self.current - 1 ) % (self.numberOfLevels)
             return self.current 
+        
+
+    def buildAllLevels(self):
+        pass

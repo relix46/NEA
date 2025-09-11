@@ -97,6 +97,38 @@ class createDungeon:
         
         return DMap
                           
+
+    def chooseStairsInRooms(self): #picks a random room for up and another for down
+        if len(self.rooms) == 0:
+            self.stairsUp = None
+            self.stairsDown = None
+            return None, None
+        else:
+            upRoom = random.choice(self.rooms)
+            if len(self.rooms) >= 2:
+                downRoom  = random.choice(self.rooms)
+                counter = 0
+                while counter < 10:
+                    downRoom = random.choice(self.rooms)
+                    counter = counter + 1
+            else:
+                downRoom = upRoom
+
+            mapCenterX = self.dungeonConfig.width // 2
+            mapCenterY = self.dungeonConfig.height // 2
+            upEdge = upRoom.boundaryPointsFacing(mapCenterX, mapCenterY)
+            downEdge = downRoom.boundaryPointsFacing(mapCenterX, mapCenterY)
+            if len(upEdge) > 0:
+                self.stairsUp = upEdge[0]
+            else:
+                self.stairsUp = upRoom.center()
+            if len(downEdge) > 0:
+                self.stairsDown = downEdge[0]
+            else:
+                self.stairsDown = downRoom.center()
+            return self.stairsUp, self.stairsDown
+            
+
         
 
 

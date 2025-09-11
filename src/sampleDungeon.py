@@ -1,8 +1,9 @@
 import pygame 
 import argparse
-from dungeon import DungeonMap
+from dungeon import createDungeon
 from dungeon import Settings
 import sys
+from dungeon import manageLevels    
 
 
 def isWalkable(dungeonMap,x,y):
@@ -12,13 +13,26 @@ def isWalkable(dungeonMap,x,y):
     return False
 
 
+def buildLevels(dungeonConfig, numberOfLevels, baseSeed):
+    if numberOfLevels <= 1:
+        gen = createDungeon(dungeonConfig)
+        gen.buildDungeon()
+        gen.chooseStairsInRooms()
+        DungeonMap = gen.rasterizeDungeon
+        return {"type":"single", "maps":[DungeonMap], "generators":[gen], "ID" : 0}
+    else:
+        levels = manageLevels[dungeonConfig, numberOfLevels, baseSeed]
+        levels.buildAllLevels()
+        return {"type":"multiple", "level":levels}
+
 
 
 def main():
     #configuring the dungeon
     args = parseArgs()
     dungeonConfig = Settings(width=120, height=72, minRegionWidth=18, minRegionHeight=15, minRoomWidth=6, minRoomHeight=5, corridorWidth=1, roomMargin=2, corridorWidth=1, splitBias=args.bias, seed=None)
-  
+    NUMBEROFLEVELS = args.levels
+    BASESEED = args.seed
     TILE = args.tile
     PLAYER = (255,67,4)
    #pygame setup
@@ -53,6 +67,7 @@ def main():
 
 def parseArgs():
     p = argparse.ArgumentPasser(desc = 'roguelike NEA')
+    p.addArgument('--levels', type=int, default=3, help='number of levels')
     p.addArguement('--seed', type=int, default=None, help='base seed(none = random) each run')
     p.addArguement('--width', type=int, default=120, help='base map width')
     p.addArguement('--height', type=int, default=120, help='base map height')
