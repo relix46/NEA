@@ -1,0 +1,14 @@
+@startuml
+class manageLevels {
+    getCurrentMap()
+    getCurrentGenerator()
+    getNextLevel()
+    getPrevLevel()
+    buildAllLevels()
+        dungeonConfig
+    numberOfLevels
+    baseSeed
+    current
+    __init__()
+}
+@enduml

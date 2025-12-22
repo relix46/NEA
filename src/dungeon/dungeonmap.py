@@ -1,7 +1,7 @@
 import pygame
 class DungeonMap:
     #dungeonmap is a 2D tilemap grid using the following key for tiling: 
-    #0 = wall, 1 = room, 2 = corridoor
+    #0 = wall, 1 = room, 2 = corridoor, 3= stairsup, 4= stairsdown
     def __init__(self, width, height):
         self.width = width
         self.height = height

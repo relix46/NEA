@@ -129,6 +129,22 @@ class createDungeon:
             return self.stairsUp, self.stairsDown
             
 
+
+    def rootDoors(self, roomA, roomB):
+        Adoors = roomA.boundaryPointsFacing(roomB.getCenter())
+        Bdoors = roomB.boundaryPointsFacing(roomA.getCenter())
+        if len(Adoors) == 0 or len(Bdoors) == 0:
+            a = roomA.getCenter()
+            b = roomB.getCenter()
+            return[a, (b[0], a[1]), b]
+        
+        a = Adoors[0] 
+        b = Bdoors[0]
+        return[a, (b[0], a[1]), b]
+    
+
+
+
         
 
 
