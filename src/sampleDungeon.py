@@ -3,7 +3,8 @@ import argparse
 from dungeon import createDungeon
 from dungeon import Settings
 import sys
-from dungeon import manageLevels    
+from dungeon import manageLevels
+from dungeon.manageLevels import manageLevels
 
 
 def isWalkable(dungeonMap,x,y):
@@ -15,15 +16,15 @@ def isWalkable(dungeonMap,x,y):
 
 def buildLevels(dungeonConfig, numberOfLevels, baseSeed):
     if numberOfLevels <= 1:
-        gen = createDungeon(dungeonConfig)
-        gen.buildDungeon()
-        gen.chooseStairsInRooms()
-        DungeonMap = gen.rasterizeDungeon
+        DungeonGen = createDungeon(dungeonConfig)
+        DungeonGen.buildDungeon()
+        DungeonGen.chooseStairsInRooms()
+        DungeonMap = DungeonGen.rasterizeDungeon
         return {"type":"single", "maps":[DungeonMap], "generators":[DungeonGen], "ID" : 0}
     else:
-        levels = manageLevels[dungeonConfig, numberOfLevels, baseSeed]
+        levels = manageLevels(dungeonConfig, numberOfLevels, baseSeed)
         levels.buildAllLevels()
-        return {"type":"multiple", "level":levels}
+        return {"type":"multiple", "level":"levels"}
 
 def findSpawn(gen, dungeonMap):
     if gen.stairsUp is not None:
@@ -41,19 +42,19 @@ def findSpawn(gen, dungeonMap):
         return (0,0)
 
 def parseArgs():
-    p = argparse.ArgumentPasser(desc = 'roguelike NEA')
-    p.addArgument('--levels', type=int, default=3, help='number of levels')
-    p.addArguement('--seed', type=int, default=None, help='base seed(none = random) each run')
-    p.addArguement('--width', type=int, default=120, help='base map width')
-    p.addArguement('--height', type=int, default=120, help='base map height')
-    p.addArguement('--tile', type=int, default=10, help='tile size (px)')
-    p.addArguement('--bias', type=float, default=0.6, help='split bias where region is a square') #used to randomly decide the room orientation
-    return p.parseArgs()
+    p = argparse.ArgumentParser(description= 'roguelike NEA')
+    p.add_argument('--levels', type=int, default=3, help='number of levels')
+    p.add_argument('--seed', type=int, default=None, help='base seed(none = random) each run')
+    p.add_argument('--width', type=int, default=120, help='base map width')
+    p.add_argument('--height', type=int, default=120, help='base map height')
+    p.add_argument('--tile', type=int, default=10, help='tile size (px)')
+    p.add_argument('--bias', type=float, default=0.6, help='split bias where region is a square') #used to randomly decide the room orientation
+    return p.parse_args()
 
 def main():
     #configuring the dungeon
     args = parseArgs()
-    dungeonConfig = Settings(width=120, height=72, minRegionWidth=18, minRegionHeight=15, minRoomWidth=6, minRoomHeight=5, corridorWidth=1, roomMargin=2, corridorWidth=1, splitBias=args.bias, seed=None)
+    dungeonConfig = Settings(width=120, height=72, minRegionWidth=18, minRegionHeight=15, minRoomWidth=6, minRoomHeight=5, corridorWidth=1, roomMargin=2, splitBias=args.bias, seed=None)
     NUMBEROFLEVELS = args.levels
     BASESEED = args.seed
     TILE = args.tile
