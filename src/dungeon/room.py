@@ -17,7 +17,7 @@ class Room:
         #these points will be used to place the corridors
         result = []
         tx, ty = target #assigning x and y coords for target
-        cx, cy = self.center() 
+        cx, cy = self.getCenter() 
         dx = tx - cx
         dy = ty- cy
         if abs(dx) >= abs(dy):
@@ -53,13 +53,6 @@ class Room:
                 x = x + 1
             i = 0
             while i < len(xcoords):
-                result.append((yEdge, xcoords[i]))
+                result.append((xcoords[i], yEdge))
                 i = i + 1
         return result
-
-
-
-        
-
-
-        

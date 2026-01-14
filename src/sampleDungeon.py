@@ -3,7 +3,6 @@ import argparse
 from dungeon import createDungeon
 from dungeon import Settings
 import sys
-from dungeon import manageLevels
 from dungeon.manageLevels import manageLevels
 
 
@@ -19,12 +18,12 @@ def buildLevels(dungeonConfig, numberOfLevels, baseSeed):
         DungeonGen = createDungeon(dungeonConfig)
         DungeonGen.buildDungeon()
         DungeonGen.chooseStairsInRooms()
-        DungeonMap = DungeonGen.rasterizeDungeon
+        DungeonMap = DungeonGen._rasterizeDungeon()
         return {"type":"single", "maps":[DungeonMap], "generators":[DungeonGen], "ID" : 0}
     else:
         levels = manageLevels(dungeonConfig, numberOfLevels, baseSeed)
         levels.buildAllLevels()
-        return {"type":"multiple", "level":"levels"}
+        return {"type":"multiple", "levels":levels}
 
 def findSpawn(gen, dungeonMap):
     if gen.stairsUp is not None:
@@ -34,10 +33,9 @@ def findSpawn(gen, dungeonMap):
         while y < dungeonMap.height:
             x = 0
             while x < dungeonMap.width:
-                if dungeonMap[y][x] != 0: ##wall***
-                    return [x,y]
-                else:
-                    x += 1
+                if dungeonMap.tiles[y][x] != 0: ##wall***
+                    return (x,y)
+                x += 1
             y += 1
         return (0,0)
 
@@ -87,79 +85,79 @@ def main():
         for event in pygame.event.get():    
             if event.type == pygame.QUIT:
                 running = False
-            elif event.py == pygame.KEYDOWN:
+            elif event.type == pygame.KEYDOWN:
                 nx, ny = px, py
                 if event.key == pygame.K_UP:
-                    ny = ny + 1  
+                    ny = ny - 1  
                 elif event.key == pygame.K_DOWN:
-                    ny = ny - 1
+                    ny = ny + 1
                 elif event.key == pygame.K_LEFT:
                     nx = nx - 1
                 elif event.key == pygame.K_RIGHT:
                     nx = nx + 1
 
-                if (nx, ny) != (px,py) and isWalkable[nx, ny]:
+                if (nx, ny) != (px,py) and isWalkable(currentMap, nx, ny):
                     px,py = nx,ny
                     tile = currentMap.tiles[py][px]
-                    if bundle['type'] == 'multi':
+                    if bundle['type'] == 'multiple':
                         if tile == 3:
-                            levels.getPrevLevel() 
+                            levels.prevLevel() 
                             currentMap = levels.getCurrentMap()
                             currentGen = levels.getCurrentGen()
-                            if currentGen.stairDown is not None:
-                                px,py = currentGen.stairDown
+                            if currentGen.stairsDown is not None:
+                                px,py = currentGen.stairsDown
                             else:
                                 px,py = findSpawn(currentGen, currentMap)
                         elif tile == 4:
-                            levels.getNextLevel()
+                            levels.nextLevel()
                             currentMap = levels.getCurrentMap()
                             currentGen = levels.getCurrentGen()
-                            if currentGen.stairUp is not None:
-                                px,py = currentGen.stairUp
+                            if currentGen.stairsUp is not None:
+                                px,py = currentGen.stairsUp
                             else:
                                 px,py = findSpawn(currentGen, currentMap)
                     
-                    #level switching
-                    if event.key == pygame.K_r:
+                #level switching
+                if event.key == pygame.K_r:
+                    bundle = buildLevels(dungeonConfig, NUMBEROFLEVELS, BASESEED)
+                    if bundle['type'] == 'single':
+                        currentMap = bundle['maps'][0]
+                        currentGen = bundle['generators'][0]
+                    else:
+                        levels = bundle['levels']
+                        currentMap = levels.getCurrentMap()
+                        currentGen = levels.getCurrentGen()
+                    px,py = findSpawn(currentGen, currentMap)
+                elif event.key == pygame.K_RIGHTBRACKET:
+                    if bundle['type'] == 'multiple':
+                        levels.nextLevel()
+                        currentMap = levels.getCurrentMap()
+                        currentGen = levels.getCurrentGen()
+                        px,py = findSpawn(currentGen, currentMap)
+                elif event.key == pygame.K_LEFTBRACKET:
+                    if bundle['type'] == 'multiple':
+                        levels.prevLevel()
+                        currentMap = levels.getCurrentMap()
+                        currentGen = levels.getCurrentGen()
+                        px,py = findSpawn(currentGen, currentMap)
+                elif event.key == pygame.K_PLUS or event.key == pygame.K_EQUALS:
+                    NUMBEROFLEVELS += 1
+                    bundle = buildLevels(dungeonConfig, NUMBEROFLEVELS, BASESEED)
+                    if bundle['type'] == 'single':
+                        currentMap = bundle['maps'][0]
+                        currentGen = bundle['generators'][0]
+                    else:
+                        levels = bundle['levels']
+                        currentMap = levels.getCurrentMap()
+                        currentGen = levels.getCurrentGen()
+                    px,py = findSpawn(currentGen, currentMap)
+                elif event.key == pygame.K_MINUS:
+                    if NUMBEROFLEVELS > 1:
+                        NUMBEROFLEVELS -= 1
                         bundle = buildLevels(dungeonConfig, NUMBEROFLEVELS, BASESEED)
                         if bundle['type'] == 'single':
-                            currentMap = bundle['DungeonMap'][0]
-                            currentGen = bundle['DungeonGen'][0]
-                        else:
-                            levels = bundle['levels']
-                            currentMap = levels.getCurrentMap()
-                            currentGen = levels.getCurrentGen()
-                        px,py = findSpawn(currentGen, currentMap)
-                    elif event.key == pygame.K_RIGHTBRACKET:
-                        if bundle['type'] == 'multi':
-                            levels.nextLevel()
-                            currentMap = levels.getCurrentMap()
-                            currentGen = levels.getCurrentGen()
-                            px,py = findSpawn(currentGen, currentMap)
-                    elif event.key == pygame.K_LEFTBRACKET:
-                        if bundle['type'] == 'multi':
-                            levels.nextLevel()
-                            currentMap = levels.getCurrentMap()
-                            currentGen = levels.getCurrentGen()
-                            px,py = findSpawn(currentGen, currentMap)
-                    elif event.key == pygame.K_PLUS or event.key == pygame.K_EQUALS:
-                        NUMBEROFLEVELS += 1
-                        bundle = buildLevels(dungeonConfig, NUMBEROFLEVELS, BASESEED)
-                        if bundle['type'] == 'single':
-                            currentMap = bundle['DungeonMap'][0]
-                            currentGen = bundle['DungeonGen'][0]
-                        else:
-                            levels = bundle['levels']
-                            currentMap = levels.getCurrentMap()
-                            currentGen = levels.getCurrentGen()
-                        px,py = findSpawn(currentGen, currentMap)
-                    elif event.key == pygame.K_MINUS:
-                        if NUMBEROFLEVELS > 1:
-                            NUMBEROFLEVELS -= 1
-                            bundle = buildLevels(dungeonConfig, NUMBEROFLEVELS, BASESEED)
-                        if bundle['type'] == 'single':
-                            currentMap = bundle['DungeonMap'][0]
-                            currentGen = bundle['DungeonGen'][0]
+                            currentMap = bundle['maps'][0]
+                            currentGen = bundle['generators'][0]
                         else:
                             levels = bundle['levels']
                             currentMap = levels.getCurrentMap()
@@ -169,15 +167,15 @@ def main():
         #draw screen
         screen.fill((0,0,0))
         if bundle['type'] == 'single':
-            currentMap = bundle['DungeonMap'][0]
-            currentGen = bundle['DungeonGen'][0]
+            currentMap = bundle['maps'][0]
+            currentGen = bundle['generators'][0]
         else:
             currentMap = levels.getCurrentMap()
             currentGen = levels.getCurrentGen()
         currentMap.drawDungeon(screen, tileSize = TILE)
 
         #draw player
-        pygame.draw.rect(screen, (255,40,120), pygame.rect(px*TILE, py*TILE, TILE, TILE))
+        pygame.draw.rect(screen, (255,40,120), pygame.Rect(px*TILE, py*TILE, TILE, TILE))
 
         pygame.display.update()
         clock.tick(60)
@@ -189,6 +187,3 @@ def main():
 #calls the main method when the project is run
 if __name__ == '__main__':
     main()
-    
-
-
