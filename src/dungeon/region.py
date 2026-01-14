@@ -101,10 +101,10 @@ class Region:
 
 
 
-def splitUntilCannot(dungeonConfig, root): #try splitting else marks it as a leaf
+def splitUntilCannot(root, dungeonConfig): #try splitting else marks it as a leaf
     leaves = []
     stack = [root]
-    while len(stack) >= 0:
+    while len(stack) > 0:
         node = stack.pop()
         if node.split(dungeonConfig) == True:
             stack.append(node.left)

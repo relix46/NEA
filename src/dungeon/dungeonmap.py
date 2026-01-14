@@ -42,13 +42,13 @@ class DungeonMap:
                 y = yend
                 yE = ystart
             while y <= yE:
-                dx = width // 2
+                dx = -width // 2
                 while dx <= width // 2:
                     xx = xstart + dx
                     if 0 <= xx < self.width and 0 <= y < self.height:
                         if self.tiles[y][xx] == 0:
                             self.tiles[y][xx] = 2 #corridoor
-                        dx = dx + 1
+                    dx = dx + 1
                 y = y + 1
         elif (ystart == yend):
             if xstart <= xend:
@@ -58,9 +58,9 @@ class DungeonMap:
                 x = xend
                 xE = xstart
             while x <= xE:
-                dy = width // 2
+                dy = -width // 2
                 while dy <= width // 2:
-                    yy = ystart = dy
+                    yy = ystart + dy
                     if 0 <= x < self.width and 0 <= yy < self.height:
                         if self.tiles[yy][x] == 0:
                             self.tiles[yy][x] = 2
@@ -78,7 +78,7 @@ class DungeonMap:
 
         #draw background square
         rect = pygame.Rect(x*tileSize, y*tileSize, tileSize, tileSize)
-        pygame.draw.Rect(surface, baseColor, rect)
+        pygame.draw.rect(surface, baseColor, rect)
 
         #create a 5 step stair
         stepHeight = max(2, tileSize // 5) #create step with minimum height of 2
@@ -91,7 +91,8 @@ class DungeonMap:
                 height = stepHeight - 1
 
             stepRect = pygame.Rect(rect.left, rect.top + i * stepHeight, width, height)
-            pygame.draw.Rect(surface, stepColor, stepHeight)
+            pygame.draw.rect(surface, stepColor, stepRect)
+            i = i + 1
 
 
 
@@ -106,11 +107,11 @@ class DungeonMap:
             while x < self.width:
                 t = row[x] #navigating through rows in the chosen column
                 if t == 0:
-                    pygame.draw.rect(surface, WALL, pygame.rect(x*tileSize, y*tileSize, tileSize, tileSize))
+                    pygame.draw.rect(surface, WALL, pygame.Rect(x*tileSize, y*tileSize, tileSize, tileSize))
                 elif t == 1:
-                    pygame.draw.rect(surface, ROOM, pygame.rect(x*tileSize, y*tileSize, tileSize, tileSize))
+                    pygame.draw.rect(surface, ROOM, pygame.Rect(x*tileSize, y*tileSize, tileSize, tileSize))
                 elif t == 2:
-                    pygame.draw.rect(surface, CORRIDOR, pygame.rect(x*tileSize, y*tileSize, tileSize, tileSize))
+                    pygame.draw.rect(surface, CORRIDOR, pygame.Rect(x*tileSize, y*tileSize, tileSize, tileSize))
                 elif t == 3:
                     self.drawStairs(surface, x, y, tileSize, up = True)
                 else:
