@@ -116,32 +116,83 @@ def findSpawn(gen, dungeonMap):
     return (0, 0)
 
 
-def main():
-    args = parseArgs()
+def show_main_menu(screen, clock):
+    """
+    Display the main menu and return the user's choice:
+    "play" or "quit". "Load Saved Game" is a placeholder.
+    """
+    SCREEN_W, SCREEN_H = screen.get_size()
 
-    dungeonConfig = Settings(
-        width=120,
-        height=72,
-        minRegionWidth=18,
-        minRegionHeight=15,
-        minRoomWidth=6,
-        minRoomHeight=5,
-        corridorWidth=1,
-        roomMargin=2,
-        splitBias=0.6,
-        seed=args.seed
-    )
+    # Dark, atmospheric colors
+    BG_COLOR = (8, 10, 18)
+    TITLE_COLOR = (210, 210, 240)
+    TEXT_COLOR = (150, 155, 180)
+    HIGHLIGHT_COLOR = (200, 170, 80)
 
-    TILE = args.tile
-    NUMBEROFLEVELS = args.levels
-    BASESEED = args.seed
+    pygame.font.init()
+    title_font = pygame.font.Font(None, 80)
+    menu_font = pygame.font.Font(None, 48)
+    info_font = pygame.font.Font(None, 28)
 
-    pygame.init()
-    SCREEN_W, SCREEN_H = 1280, 720
-    screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))
-    pygame.display.set_caption("Dungeon Game")
-    clock = pygame.time.Clock()
+    options = ["Play New Game", "Load Saved Game", "Quit Game"]
+    selected = 0
 
+    message = ""
+    message_time = 0
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return "quit"
+            if event.type == pygame.KEYDOWN:
+                if event.key in (pygame.K_UP, pygame.K_w):
+                    selected = (selected - 1) % len(options)
+                elif event.key in (pygame.K_DOWN, pygame.K_s):
+                    selected = (selected + 1) % len(options)
+                elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                    if selected == 0:
+                        return "play"
+                    elif selected == 1:
+                        message = "Loading saved games is not implemented yet."
+                        message_time = pygame.time.get_ticks()
+                    else:
+                        return "quit"
+
+        # Drawing
+        screen.fill(BG_COLOR)
+
+        # Title
+        title_surf = title_font.render("Dungeon Game", True, TITLE_COLOR)
+        title_rect = title_surf.get_rect(center=(SCREEN_W // 2, SCREEN_H // 3))
+        screen.blit(title_surf, title_rect)
+
+        # Menu options
+        start_y = SCREEN_H // 2
+        for i, text in enumerate(options):
+            color = HIGHLIGHT_COLOR if i == selected else TEXT_COLOR
+            surf = menu_font.render(text, True, color)
+            rect = surf.get_rect(center=(SCREEN_W // 2, start_y + i * 55))
+            screen.blit(surf, rect)
+
+        # Info / placeholder message
+        if message:
+            now = pygame.time.get_ticks()
+            if now - message_time < 2500:
+                info_surf = info_font.render(message, True, TEXT_COLOR)
+                info_rect = info_surf.get_rect(center=(SCREEN_W // 2, SCREEN_H - 60))
+                screen.blit(info_surf, info_rect)
+            else:
+                message = ""
+
+        pygame.display.update()
+        clock.tick(60)
+
+    return "quit"
+
+
+def run_game(screen, clock, dungeonConfig, TILE, NUMBEROFLEVELS, BASESEED):
+    SCREEN_W, SCREEN_H = screen.get_size()
     bundle = buildLevels(dungeonConfig, NUMBEROFLEVELS, BASESEED)
     if bundle["type"] == "single":
         currentMap = bundle["maps"][0]
@@ -235,6 +286,37 @@ def main():
 
         pygame.display.update()
         clock.tick(60)
+
+
+def main():
+    args = parseArgs()
+
+    dungeonConfig = Settings(
+        width=120,
+        height=72,
+        minRegionWidth=18,
+        minRegionHeight=15,
+        minRoomWidth=6,
+        minRoomHeight=5,
+        corridorWidth=1,
+        roomMargin=2,
+        splitBias=0.6,
+        seed=args.seed
+    )
+
+    TILE = args.tile
+    NUMBEROFLEVELS = args.levels
+    BASESEED = args.seed
+
+    pygame.init()
+    SCREEN_W, SCREEN_H = 1280, 720
+    screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))
+    pygame.display.set_caption("Dungeon Game")
+    clock = pygame.time.Clock()
+
+    choice = show_main_menu(screen, clock)
+    if choice == "play":
+        run_game(screen, clock, dungeonConfig, TILE, NUMBEROFLEVELS, BASESEED)
 
     pygame.quit()
 
