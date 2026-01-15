@@ -25,28 +25,40 @@ class manageLevels:
             return
         else:
             self.current = (self.current - 1 ) % (self.numberOfLevels)
-            return self.current 
-        
+            return self.current
+
+    def nextLevel(self):
+        if self.numberOfLevels == 0:
+            return
+        self.current = (self.current + 1) % self.numberOfLevels
+
+    def prevLevel(self):
+        if self.numberOfLevels == 0:
+            return
+        self.current = (self.current - 1) % self.numberOfLevels
 
     def getCurrentGen(self):
-        return self.generators[self.current]
-
+        return self.generators[self.current] 
+        
 
     def buildAllLevels(self):
-        #build all floors, very seed per floor if baseSeed is provided
+        """Build all floors; vary seed per floor if baseSeed provided."""
         from .createDungeon import createDungeon
         self.levels = []
         self.generators = []
         i = 0
         while i < self.numberOfLevels:
-            if self.baseSeed is not None:
+            if self.baseSeed is None:
+                self.dungeonConfig.seed = None
+            else:
                 self.dungeonConfig.seed = self.baseSeed + i
 
             gen = createDungeon(self.dungeonConfig)
             gen.buildDungeon()
             gen.chooseStairsInRooms()
-            dungeonMap = gen._rasterizeDungeon()
-            self.levels.append(dungeonMap)
+            dmap = gen._rasterizeDungeon()
+
+            self.levels.append(dmap)
             self.generators.append(gen)
             i += 1
         self.current = 0

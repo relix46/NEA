@@ -171,3 +171,15 @@ class createDungeon:
             else:
                 self.stairsDown = downRoom.getCenter()
             return self.stairsUp, self.stairsDown
+            
+
+
+    
+
+
+
+        
+
+
+
+
